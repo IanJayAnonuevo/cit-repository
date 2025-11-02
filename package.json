@@ -1,0 +1,25 @@
+{
+  "name": "cit-repository",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.16",
+    "@vitejs/plugin-react": "^5.1.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.16",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.9.5"
+  }
+}

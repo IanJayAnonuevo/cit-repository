@@ -20,7 +20,9 @@ export default function CapstoneSearch() {
         year: 2023,
             category: "Web App",
             filterType: "Recent",
-            keywords: ["agrilearn", "agriculture", "farming", "production", "planning", "crops", "web", "system"]
+            keywords: ["agrilearn", "agriculture", "farming", "production", "planning", "crops", "web", "system"],
+            abstract: "AgriLearn is a web-based production planning system for high-value crops in the Philippines. It helps farmers, students, and enthusiasts with crop selection, planting recommendations, cost estimation, and yield forecasting.",
+            tags: ["Web App", "Agriculture", "IoT"]
         },
         {
             id: 2,
@@ -29,7 +31,9 @@ export default function CapstoneSearch() {
             year: 2024,
             category: "Mobile App",
             filterType: "Recent",
-            keywords: ["smartfarm", "iot", "agricultural", "monitoring", "mobile", "farming", "sensors"]
+            keywords: ["smartfarm", "iot", "agricultural", "monitoring", "mobile", "farming", "sensors"],
+            abstract: "SmartFarm Mobile is an IoT-based agricultural monitoring system that enables real-time tracking of crop conditions, soil moisture, temperature, and other environmental factors through mobile devices.",
+            tags: ["Mobile App", "IoT", "Agriculture"]
         },
         {
             id: 3,
@@ -38,7 +42,9 @@ export default function CapstoneSearch() {
             year: 2022,
             category: "Networking",
             filterType: "Popular",
-            keywords: ["network", "security", "analyzer", "enterprise", "systems", "cybersecurity"]
+            keywords: ["network", "security", "analyzer", "enterprise", "systems", "cybersecurity"],
+            abstract: "A comprehensive network security analyzer designed for enterprise systems to detect vulnerabilities, monitor network traffic, and provide real-time threat analysis and prevention mechanisms.",
+            tags: ["Networking", "Security", "Enterprise"]
         },
         {
             id: 4,
@@ -47,7 +53,9 @@ export default function CapstoneSearch() {
             year: 2023,
             category: "IoT",
             filterType: "Popular",
-            keywords: ["home", "automation", "iot", "sensors", "smart", "house"]
+            keywords: ["home", "automation", "iot", "sensors", "smart", "house"],
+            abstract: "An intelligent home automation system that utilizes IoT sensors to control lighting, temperature, security, and other home appliances remotely through a centralized mobile application.",
+            tags: ["IoT", "Automation", "Smart Home"]
         }
     ]
 
@@ -228,7 +236,19 @@ export default function CapstoneSearch() {
             ) : (
                 <div className="min-h-screen bg-white flex flex-col">
                     <section className="relative pt-24 md:pt-32 pb-16 animate-fade-in flex-1">
-                    <div className="mx-auto max-w-7xl px-6">
+                        {/* V9.svg gradient background */}
+                        <div className="absolute inset-0 bg-white" aria-hidden />
+                        <div 
+                            className="absolute inset-0 opacity-100" 
+                            style={{ 
+                                backgroundImage: `url(${V9Gradient})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat'
+                            }} 
+                            aria-hidden 
+                        />
+                    <div className="relative mx-auto max-w-7xl px-6">
                             {/* Title */}
                             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-8 leading-snug md:leading-tight">Search Results</h2>
 
@@ -255,20 +275,20 @@ export default function CapstoneSearch() {
                                         <option value="Networking">Networking</option>
                                         <option value="IoT">IoT</option>
                                     </select>
-                                </div>
+                            </div>
 
                                 <form onSubmit={handleResultsSearch} className="relative w-full md:max-w-sm group">
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={handleInputChange}
-                                        placeholder="Search capstone..."
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={handleInputChange}
+                                    placeholder="Search capstone..."
                                         className="w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                                         onKeyDown={(e) => e.key === 'Enter' && handleResultsSearch(e)}
-                                    />
+                                />
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-purple-600 transition-colors">
-                                        <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 104.2 12.06l4.24 4.24a.75.75 0 101.06-1.06l-4.24-4.24A6.75 6.75 0 0010.5 3.75zm-5.25 6.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0z" clipRule="evenodd" />
-                                    </svg>
+                                    <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 104.2 12.06l4.24 4.24a.75.75 0 101.06-1.06l-4.24-4.24A6.75 6.75 0 0010.5 3.75zm-5.25 6.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0z" clipRule="evenodd" />
+                                </svg>
                                 </form>
                             </div>
 
@@ -285,37 +305,62 @@ export default function CapstoneSearch() {
                                         </div>
                                     </div>
                                 ) : hasResults ? (
-                                    // Show only first matching card
-                                    filteredCards.slice(0, 1).map((card) => (
+                                    // Show all matching cards with fade-in animation
+                                    filteredCards.map((card, index) => (
                                         <article 
                                             key={card.id} 
-                                            className="rounded-xl border border-purple-200 bg-white p-6 shadow-sm hover:shadow-md transition-all duration-200"
+                                            className="rounded-xl bg-gray-50 p-6 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-card"
+                                            style={{ animationDelay: `${index * 0.1}s` }}
                                         >
-                                            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <h3 className="text-lg font-bold text-gray-900 mb-3">{card.title}</h3>
-                                                    <div className="space-y-1 text-sm text-gray-600 mb-3">
-                                                        <p>Authors: {card.author}</p>
-                                                        <p>Year: {card.year}</p>
-                                                    </div>
-                                                    <span className="inline-block rounded-full bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1">
-                                                        {card.category}
+                                            {/* Title */}
+                                            <h3 className="text-xl font-bold text-gray-900 mb-3">{card.title}</h3>
+                                            
+                                            {/* Authors and Year */}
+                                            <p className="text-sm text-gray-600 mb-4">
+                                                Authors: {card.author} | Year: {card.year}
+                                            </p>
+                                            
+                                            {/* Abstract Section */}
+                                            <div className="mb-4">
+                                                <p className="font-semibold text-gray-900 mb-2">Abstract</p>
+                                                <p className="text-sm text-gray-700 leading-relaxed">
+                                                    {card.abstract || "No abstract available for this capstone project."}
+                                                </p>
+                                            </div>
+                                            
+                                            {/* Tags */}
+                                            <div className="flex flex-wrap gap-2 mb-6">
+                                                {card.tags && card.tags.map((tag, tagIndex) => (
+                                                    <span 
+                                                        key={tagIndex}
+                                                        className="inline-block rounded-full bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1"
+                                                    >
+                                                        {tag}
                                                     </span>
-                                                </div>
-                                                <div className="flex items-center gap-3 md:flex-shrink-0">
-                                                    <button className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                                                            <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.25l8.97-8.97a.75.75 0 111.06 1.06l-9.5 9.5a.75.75 0 01-1.06 0l-9.5-9.5a.75.75 0 111.06-1.06l8.97 8.97V3a.75.75 0 01.75-.75zm6 13.5a.75.75 0 01.75.75v7.5a.75.75 0 01-1.5 0v-7.5a.75.75 0 01.75-.75zM3.75 19.5a.75.75 0 100-1.5H2.25a.75.75 0 100 1.5h1.5zm15 0a.75.75 0 100-1.5h-1.5a.75.75 0 100 1.5h1.5z" clipRule="evenodd" />
-                                                        </svg>
-                                                        Download
-                                                    </button>
-                                                    <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                                                        </svg>
-                                                        Open
-                                                    </button>
-                                                </div>
+                                                ))}
+                                            </div>
+                                            
+                                            {/* Action Buttons */}
+                                            <div className="flex items-center gap-3 justify-end">
+                                                <button className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white hover:from-purple-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                                                        <path fillRule="evenodd" d="M4.5 3.75a3 3 0 013-3h9a3 3 0 013 3v4.5a.75.75 0 01-1.5 0V3.75a1.5 1.5 0 00-1.5-1.5h-9a1.5 1.5 0 00-1.5 1.5v16.5a1.5 1.5 0 001.5 1.5h9a1.5 1.5 0 001.5-1.5v-4.5a.75.75 0 011.5 0v4.5a3 3 0 01-3 3h-9a3 3 0 01-3-3V3.75z" clipRule="evenodd" />
+                                                        <path fillRule="evenodd" d="M15.75 4.5a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0V6.31l-2.47 2.47a.75.75 0 11-1.06-1.06l2.47-2.47H12a.75.75 0 010-1.5h3.75z" clipRule="evenodd" />
+                                                    </svg>
+                                                    Summarize
+                                                </button>
+                                                <button className="inline-flex items-center gap-2 rounded-lg bg-purple-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                                                        <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.25l8.97-8.97a.75.75 0 111.06 1.06l-9.5 9.5a.75.75 0 01-1.06 0l-9.5-9.5a.75.75 0 111.06-1.06l8.97 8.97V3a.75.75 0 01.75-.75zm6 13.5a.75.75 0 01.75.75v7.5a.75.75 0 01-1.5 0v-7.5a.75.75 0 01.75-.75zM3.75 19.5a.75.75 0 100-1.5H2.25a.75.75 0 100 1.5h1.5zm15 0a.75.75 0 100-1.5h-1.5a.75.75 0 100 1.5h1.5z" clipRule="evenodd" />
+                                                    </svg>
+                                                    Download
+                                                </button>
+                                                <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                    </svg>
+                                                    Open
+                                                </button>
                                             </div>
                                         </article>
                                     ))
@@ -331,7 +376,7 @@ export default function CapstoneSearch() {
                                         </p>
                                     </div>
                                 )}
-                            </div>
+                        </div>
 
                             {/* Pagination */}
                             <div className="flex items-center justify-center gap-4">

@@ -2,18 +2,15 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import V9Gradient from "../../assets/images/V9.svg"
 
-export default function CapstoneProjects() {
+export default function AdminAccountManagement() {
   const navigate = useNavigate()
-  const [isChoiceModalOpen, setIsChoiceModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [uploadType, setUploadType] = useState(null) // 'manual' or 'bulk'
   const [currentPage, setCurrentPage] = useState(1)
   const [filterType, setFilterType] = useState('All')
-  const [categoryFilter, setCategoryFilter] = useState('Category')
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  const [uploadedFile, setUploadedFile] = useState(null)
-  const [bulkFiles, setBulkFiles] = useState([])
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showErrorModal, setShowErrorModal] = useState(false)
@@ -24,21 +21,22 @@ export default function CapstoneProjects() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   
   // Sample data
-  const [capstones, setCapstones] = useState([
-    { id: 'CP001', title: 'Capstone Title', author: 'Surname et al.', category: 'Mobile Application', year: '2021' },
-    { id: 'CP002', title: 'Capstone Title', author: 'Surname et al.', category: 'Mobile Application', year: '2021' },
-    { id: 'CP003', title: 'Capstone Title', author: 'Surname et al.', category: 'Web Application', year: '2022' },
-    { id: 'CP004', title: 'Capstone Title', author: 'Surname et al.', category: 'IoT', year: '2021' },
-    { id: 'CP005', title: 'Capstone Title', author: 'Surname et al.', category: 'Networking', year: '2023' },
+  const [admins, setAdmins] = useState([
+    { id: '22-012', fullName: 'John Doe', email: 'example@cbsua.edu.ph', role: 'Admin', status: 'Active' },
+    { id: '23-343', fullName: 'Evan Hansen', email: 'example@cbsua.edu.ph', role: 'Super Administrator', status: 'Active' },
+    { id: '21-342', fullName: 'Rick Morty', email: 'example@cbsua.edu.ph', role: 'Admin', status: 'Inactive' },
+    { id: '24-001', fullName: 'Jane Smith', email: 'jane@cbsua.edu.ph', role: 'Admin', status: 'Active' },
+    { id: '24-002', fullName: 'Mike Johnson', email: 'mike@cbsua.edu.ph', role: 'Admin', status: 'Inactive' },
+    { id: '24-003', fullName: 'Sarah Williams', email: 'sarah@cbsua.edu.ph', role: 'Super Administrator', status: 'Active' },
   ])
 
   const [formData, setFormData] = useState({
     id: '',
-    title: '',
-    author: '',
-    category: '',
-    year: '',
-    file: null
+    fullName: '',
+    email: '',
+    role: '',
+    password: '',
+    confirmPassword: ''
   })
 
   const itemsPerPage = 5
@@ -82,41 +80,13 @@ export default function CapstoneProjects() {
   }, [])
 
   const handleAdd = () => {
-    setFormData({ id: '', title: '', author: '', category: '', year: '', file: null })
-    setUploadedFile(null)
-    setBulkFiles([])
-    setUploadType(null)
-    setIsChoiceModalOpen(true)
-  }
-
-  const handleChoiceSelect = (type) => {
-    setUploadType(type)
-    setIsChoiceModalOpen(false)
-    setIsModalOpen(true)
-  }
-
-  const handleBulkFileChange = (e) => {
-    const files = Array.from(e.target.files)
-    setBulkFiles(files)
-  }
-
-
-  const handleEdit = (capstone) => {
-    setFormData({ ...capstone, file: null })
-    setUploadedFile(null)
-    setUploadType(null)
+    setFormData({ id: '', fullName: '', email: '', role: '', password: '', confirmPassword: '' })
     setIsModalOpen(true)
   }
 
   // Check if form has input data
   const hasInputData = () => {
-    if (uploadType === 'manual') {
-      return formData.title || formData.author || formData.category || formData.year || uploadedFile
-    } else if (uploadType === 'bulk') {
-      return bulkFiles.length > 0
-    } else {
-      return formData.title || formData.author || formData.category || formData.year || uploadedFile
-    }
+    return formData.fullName || formData.email || formData.role || formData.password || formData.confirmPassword
   }
 
   const handleModalClose = () => {
@@ -124,23 +94,17 @@ export default function CapstoneProjects() {
       return // Prevent closing if there's input data
     }
     setIsModalOpen(false)
-    setUploadType(null)
-    setFormData({ id: '', title: '', author: '', category: '', year: '', file: null })
-    setUploadedFile(null)
-    setBulkFiles([])
+    setFormData({ id: '', fullName: '', email: '', role: '', password: '', confirmPassword: '' })
   }
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setUploadedFile(file)
-      setFormData({ ...formData, file: file })
-    }
+  const handleEdit = (admin) => {
+    setFormData({ ...admin, password: '', confirmPassword: '' })
+    setIsModalOpen(true)
   }
 
   const handleDelete = (id) => {
-    const capstone = capstones.find(c => c.id === id)
-    setDeleteItem({ id, title: capstone?.title || 'this capstone project', type: 'capstone' })
+    const admin = admins.find(a => a.id === id)
+    setDeleteItem({ id, name: admin?.fullName || 'this admin account', type: 'admin' })
     setIsDeleteModalOpen(true)
   }
 
@@ -152,9 +116,9 @@ export default function CapstoneProjects() {
       
       // Simulate delete operation with skeleton loading
       setTimeout(() => {
-        setCapstones(capstones.filter(c => c.id !== deleteItem.id))
+        setAdmins(admins.filter(a => a.id !== deleteItem.id))
         setIsRefreshing(false)
-        setModalMessage('Capstone project deleted successfully!')
+        setModalMessage('Admin account deleted successfully!')
         setShowSuccessModal(true)
         setTimeout(() => setShowSuccessModal(false), 3000)
       }, 1000)
@@ -164,6 +128,13 @@ export default function CapstoneProjects() {
   const handleSubmit = (e) => {
     e.preventDefault()
     try {
+      if (!formData.id && formData.password !== formData.confirmPassword) {
+        setModalMessage('Passwords do not match!')
+        setShowErrorModal(true)
+        setTimeout(() => setShowErrorModal(false), 3000)
+        return
+      }
+      
       setIsRefreshing(true)
       setIsModalOpen(false)
       
@@ -171,65 +142,40 @@ export default function CapstoneProjects() {
       setTimeout(() => {
         if (formData.id) {
           // Edit existing
-          setCapstones(capstones.map(c => c.id === formData.id ? { ...formData, file: uploadedFile ? uploadedFile.name : c.file } : c))
-          setModalMessage('Capstone project updated successfully!')
+          setAdmins(admins.map(a => a.id === formData.id ? { ...formData, status: a.status } : a))
+          setModalMessage('Admin account updated successfully!')
         } else {
           // Add new
-          const newId = `CP${String(capstones.length + 1).padStart(3, '0')}`
-          setCapstones([...capstones, { ...formData, id: newId, file: uploadedFile ? uploadedFile.name : null }])
-          setModalMessage('Capstone project added successfully!')
+          const newId = `24-${String(admins.length + 1).padStart(3, '0')}`
+          setAdmins([...admins, { ...formData, id: newId, status: 'Active' }])
+          setModalMessage('Admin account added successfully!')
         }
-        setFormData({ id: '', title: '', author: '', category: '', year: '', file: null })
-        setUploadedFile(null)
-        setUploadType(null)
+        setFormData({ id: '', fullName: '', email: '', role: '', password: '', confirmPassword: '' })
         setIsRefreshing(false)
         setShowSuccessModal(true)
         setTimeout(() => setShowSuccessModal(false), 3000)
       }, 1000)
     } catch (error) {
       setIsRefreshing(false)
-      setModalMessage('Failed to save capstone project. Please try again.')
+      setModalMessage('Failed to save admin account. Please try again.')
       setShowErrorModal(true)
       setTimeout(() => setShowErrorModal(false), 3000)
     }
   }
 
-  const handleBulkSubmit = (e) => {
-    e.preventDefault()
-    try {
-      if (bulkFiles.length === 0) {
-        setModalMessage('Please select files to upload.')
-        setShowErrorModal(true)
-        setTimeout(() => setShowErrorModal(false), 3000)
-        return
-      }
-      // Handle bulk upload logic here
-      console.log('Bulk files:', bulkFiles)
-      setIsModalOpen(false)
-      setBulkFiles([])
-      setUploadType(null)
-      setModalMessage('Files uploaded successfully!')
-      setShowSuccessModal(true)
-      setTimeout(() => setShowSuccessModal(false), 3000)
-    } catch (error) {
-      setModalMessage('Failed to upload files. Please try again.')
-      setShowErrorModal(true)
-      setTimeout(() => setShowErrorModal(false), 3000)
-    }
-  }
-
-  const filteredCapstones = capstones.filter(capstone => {
-    const matchesCategory = categoryFilter === 'Category' || capstone.category === categoryFilter
+  const filteredAdmins = admins.filter(admin => {
+    const matchesFilter = filterType === 'All' || admin.status === filterType
     const matchesSearch = !searchQuery || 
-      capstone.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      capstone.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      capstone.author.toLowerCase().includes(searchQuery.toLowerCase())
+      admin.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      admin.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      admin.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      admin.role.toLowerCase().includes(searchQuery.toLowerCase())
 
-    return matchesCategory && matchesSearch
+    return matchesFilter && matchesSearch
   })
 
-  const totalFilteredPages = Math.ceil(filteredCapstones.length / itemsPerPage) || 1
-  const paginatedCapstones = filteredCapstones.slice(
+  const totalFilteredPages = Math.ceil(filteredAdmins.length / itemsPerPage) || 1
+  const paginatedAdmins = filteredAdmins.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
@@ -269,9 +215,6 @@ export default function CapstoneProjects() {
         <div className="h-10 w-24 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg relative overflow-hidden">
           <SkeletonShimmer />
         </div>
-        <div className="h-10 w-32 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg relative overflow-hidden">
-          <SkeletonShimmer />
-        </div>
       </div>
       <div className="ml-auto flex items-center gap-3">
         <div className="w-10 h-10 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg relative overflow-hidden">
@@ -301,7 +244,7 @@ export default function CapstoneProjects() {
         {/* Document Icon */}
         <div 
           onClick={() => navigate('/admin/capstone-projects')}
-          className="w-8 h-8 flex items-center justify-center text-white cursor-pointer hover:bg-purple-800 rounded-lg transition-colors bg-purple-800"
+          className="w-8 h-8 flex items-center justify-center text-white cursor-pointer hover:bg-purple-800 rounded-lg transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -311,7 +254,7 @@ export default function CapstoneProjects() {
         {/* Users/People Icon */}
         <div 
           onClick={() => navigate('/admin/account-management')}
-          className="w-8 h-8 flex items-center justify-center text-white cursor-pointer hover:bg-purple-800 rounded-lg transition-colors"
+          className="w-8 h-8 flex items-center justify-center text-white cursor-pointer hover:bg-purple-800 rounded-lg transition-colors bg-purple-800"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -342,8 +285,8 @@ export default function CapstoneProjects() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-600 to-purple-800">Capstone</span>{' '}
-            <span className="text-gray-900">Projects</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-600 to-purple-800">Admin Account</span>{' '}
+            <span className="text-gray-900">Management</span>
           </h1>
         </div>
 
@@ -363,19 +306,8 @@ export default function CapstoneProjects() {
                   className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="All">All</option>
-                  <option value="Recent">Recent</option>
-                  <option value="Popular">Popular</option>
-                </select>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                >
-                  <option value="Category">Category</option>
-                  <option value="Web Application">Web Application</option>
-                  <option value="Mobile Application">Mobile Application</option>
-                  <option value="Networking">Networking</option>
-                  <option value="IoT">IoT</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
                 </select>
               </div>
 
@@ -394,7 +326,7 @@ export default function CapstoneProjects() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search capstone..."
+                    placeholder="Search users..."
                     className="pl-4 pr-10 py-2 border border-gray-300 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                   <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,11 +342,11 @@ export default function CapstoneProjects() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Capstone ID</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Title</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Author</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Category</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Year</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Admin ID</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Full Name</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Role</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Action</th>
                 </tr>
               </thead>
@@ -428,17 +360,21 @@ export default function CapstoneProjects() {
                     <SkeletonRow />
                   </>
                 ) : (
-                  paginatedCapstones.map((capstone, index) => (
-                    <tr key={capstone.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="py-3 px-4 text-sm text-gray-900">{capstone.id}</td>
-                      <td className="py-3 px-4 text-sm text-gray-900">{capstone.title}</td>
-                      <td className="py-3 px-4 text-sm text-gray-700">{capstone.author}</td>
-                      <td className="py-3 px-4 text-sm text-gray-700">{capstone.category}</td>
-                      <td className="py-3 px-4 text-sm text-gray-700">{capstone.year}</td>
+                  paginatedAdmins.map((admin) => (
+                    <tr key={admin.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="py-3 px-4 text-sm text-gray-900">{admin.id}</td>
+                      <td className="py-3 px-4 text-sm text-gray-900">{admin.fullName}</td>
+                      <td className="py-3 px-4 text-sm text-gray-700">{admin.email}</td>
+                      <td className="py-3 px-4 text-sm text-gray-700">{admin.role}</td>
+                      <td className="py-3 px-4 text-sm">
+                        <span className={admin.status === 'Active' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                          {admin.status}
+                        </span>
+                      </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => handleEdit(capstone)}
+                            onClick={() => handleEdit(admin)}
                             className="text-purple-600 hover:text-purple-700 transition-colors"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -446,7 +382,7 @@ export default function CapstoneProjects() {
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleDelete(capstone.id)}
+                            onClick={() => handleDelete(admin.id)}
                             className="text-red-500 hover:text-red-600 transition-colors"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,56 +426,8 @@ export default function CapstoneProjects() {
           )}
         </div>
 
-        {/* Choice Modal - Manual Input or Bulk Upload */}
-        {isChoiceModalOpen && (
-          <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
-            onClick={() => setIsChoiceModalOpen(false)}
-          >
-            <div 
-              className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-600 to-purple-800">
-                  Add Capstone
-                </h2>
-                <button
-                  onClick={() => setIsChoiceModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleChoiceSelect('manual')}
-                  className="w-full flex items-center gap-3 px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <span className="font-semibold">Manual Input</span>
-                </button>
-                <button
-                  onClick={() => handleChoiceSelect('bulk')}
-                  className="w-full flex items-center gap-3 px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors shadow-md hover:shadow-lg"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <span className="font-semibold">Bulk Upload</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Manual Input Modal */}
-        {isModalOpen && uploadType === 'manual' && (
+        {/* Add/Edit Modal */}
+        {isModalOpen && (
           <div 
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
             onClick={handleModalClose}
@@ -550,7 +438,7 @@ export default function CapstoneProjects() {
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Manual Upload
+                  {formData.id ? 'Edit' : 'Add'} admin account
                 </h2>
                 <button
                   onClick={handleModalClose}
@@ -566,349 +454,116 @@ export default function CapstoneProjects() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title <span className="text-red-500">*</span>
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Add title here."
+                    placeholder="Enter Full Name"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Authors <span className="text-red-500">*</span>
+                    Email <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="text"
-                    value={formData.author}
-                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Add authors here."
+                    placeholder="Enter Email"
                     required
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select</option>
-                      <option value="Web Application">Web Application</option>
-                      <option value="Mobile Application">Mobile Application</option>
-                      <option value="Networking">Networking</option>
-                      <option value="IoT">IoT</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Year <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select</option>
-                      <option value="2021">2021</option>
-                      <option value="2022">2022</option>
-                      <option value="2023">2023</option>
-                      <option value="2024">2024</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* File Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    File <span className="text-red-500">*</span>
+                    Role <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Super Administrator">Super Administrator</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password {!formData.id && <span className="text-red-500">*</span>}
                   </label>
                   <div className="relative">
                     <input
-                      type="file"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="file-upload"
-                      accept=".pdf,.doc,.docx"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Enter password"
+                      required={!formData.id}
                     />
-                    <label
-                      htmlFor="file-upload"
-                      className="flex flex-col items-center justify-center gap-2 w-full px-4 py-8 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <span className="text-sm text-gray-600 font-medium">Upload Here</span>
-                    </label>
-                  </div>
-                  {uploadedFile && (
-                    <p className="mt-2 text-sm text-gray-600">Selected: {uploadedFile.name}</p>
-                  )}
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsModalOpen(false)
-                      setUploadType(null)
-                    }}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Bulk Upload Modal */}
-        {isModalOpen && uploadType === 'bulk' && (
-          <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
-            onClick={handleModalClose}
-          >
-            <div 
-              className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Bulk Upload
-                </h2>
-                <button
-                  onClick={handleModalClose}
-                  disabled={hasInputData()}
-                  className={`text-gray-400 hover:text-gray-600 transition-colors ${hasInputData() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <form onSubmit={handleBulkSubmit} className="space-y-4">
-                <div>
-                  <input
-                    type="file"
-                    onChange={handleBulkFileChange}
-                    className="hidden"
-                    id="bulk-file-upload"
-                    accept=".pdf,.csv"
-                    multiple
-                  />
-                  <label
-                    htmlFor="bulk-file-upload"
-                    className="flex flex-col items-center justify-center gap-4 w-full px-4 py-16 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
-                  >
-                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-700">Drag and Drop files here.</p>
-                      <p className="text-xs text-gray-500 mt-1">Only accept PDF & CSV files.</p>
-                    </div>
-                  </label>
-                  {bulkFiles.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm font-medium text-gray-700">Selected files ({bulkFiles.length}):</p>
-                      {bulkFiles.map((file, index) => (
-                        <div key={index} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          <span>{file.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsModalOpen(false)
-                      setUploadType(null)
-                    }}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Add/Edit Modal (for editing existing capstones) */}
-        {isModalOpen && !uploadType && (
-          <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
-            onClick={handleModalClose}
-          >
-            <div 
-              className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {formData.id ? 'Edit' : 'Add'} Capstone Project
-                </h2>
-                <button
-                  onClick={handleModalClose}
-                  disabled={hasInputData()}
-                  className={`text-gray-400 hover:text-gray-600 transition-colors ${hasInputData() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Author <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.author}
-                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Surname et al."
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      <option value="Web Application">Web Application</option>
-                      <option value="Mobile Application">Mobile Application</option>
-                      <option value="Networking">Networking</option>
-                      <option value="IoT">IoT</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Year <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="2021"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* File Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload File <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="file-upload"
-                      accept=".pdf,.doc,.docx"
-                    />
-                    <label
-                      htmlFor="file-upload"
-                      className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
-                    >
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <span className="text-sm text-gray-600">
-                        {uploadedFile ? uploadedFile.name : 'Click to upload or drag and drop'}
-                      </span>
-                    </label>
-                  </div>
-                  {uploadedFile && (
-                    <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>File selected: {uploadedFile.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUploadedFile(null)
-                          setFormData({ ...formData, file: null })
-                          document.getElementById('file-upload').value = ''
-                        }}
-                        className="text-red-500 hover:text-red-600 ml-2"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      {showPassword ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                         </svg>
-                      </button>
-                    </div>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500">PDF, DOC, DOCX (Max 10MB)</p>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm Password {!formData.id && <span className="text-red-500">*</span>}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Confirm password"
+                      required={!formData.id}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsModalOpen(false)
-                      setUploadType(null)
-                    }}
+                    onClick={() => setIsModalOpen(false)}
                     className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
@@ -917,7 +572,7 @@ export default function CapstoneProjects() {
                     type="submit"
                     className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg"
                   >
-                    {formData.id ? 'Update' : 'Add'} Project
+                    Save
                   </button>
                 </div>
               </form>
@@ -1047,7 +702,7 @@ export default function CapstoneProjects() {
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Confirm Delete</h2>
-              <p className="text-gray-600 text-center mb-6">Are you sure you want to delete <strong>{deleteItem?.title}</strong>? This action cannot be undone.</p>
+              <p className="text-gray-600 text-center mb-6">Are you sure you want to delete <strong>{deleteItem?.name}</strong>? This action cannot be undone.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => {

@@ -5,6 +5,7 @@ import AboutUs from './frontend/Landing Page/AboutUs'
 import AdminLoginPage from './frontend/Admin/AdminLoginPage'
 import AdminDashboard from './frontend/Admin/AdminDashboard'
 import CapstoneProjects from './frontend/Admin/CapstoneProjects'
+import AdminAccountManagement from './frontend/Admin/AdminAccountManagement'
 
 export default function App() {
 	return (
@@ -16,6 +17,7 @@ export default function App() {
 				<Route path="/admin/login" element={<AdminLoginPage />} />
 				<Route path="/admin/dashboard" element={<AdminDashboard />} />
 				<Route path="/admin/capstone-projects" element={<CapstoneProjects />} />
+				<Route path="/admin/account-management" element={<AdminAccountManagement />} />
 			</Routes>
 		</Router>
 	)
